@@ -69,9 +69,22 @@ body,
   background: #05060a;
 }
 
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
   color: #cbd5e1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a,
+button,
+input,
+[role="button"] {
+  touch-action: manipulation;
 }
 
 .glass {
@@ -123,4 +136,17 @@ body {
 .leaflet-container {
   background: #0b0e14;
   font: inherit;
+}
+
+.leaflet-interactive.map-hit {
+  pointer-events: all !important;
+  cursor: pointer;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
 }

@@ -50,12 +50,16 @@ export default function MapPanel({
       if (interactive) L.control.zoom({ position: "bottomright" }).addTo(map);
       layerRef.current = L.layerGroup().addTo(map);
       mapRef.current = map;
+      const onResize = () => map.invalidateSize();
+      window.addEventListener("resize", onResize);
+      (map as any)._rcleanup = () => window.removeEventListener("resize", onResize);
       setTimeout(() => map.invalidateSize(), 120);
       draw();
     });
     return () => {
       dead = true;
       if (mapRef.current) {
+        (mapRef.current as any)._rcleanup?.();
         mapRef.current.remove();
         mapRef.current = null;
         layerRef.current = null;
@@ -93,6 +97,7 @@ export default function MapPanel({
           weight: 1,
           fillColor: color,
           fillOpacity: 0.12,
+          interactive: false,
         }).addTo(layer);
       } else {
         L.circle([lat, lon], {
@@ -102,24 +107,33 @@ export default function MapPanel({
           dashArray: "4 6",
           fillColor: color,
           fillOpacity: 0.05,
+          interactive: false,
         }).addTo(layer);
       }
-      const dot = L.circleMarker([lat, lon], {
-        radius: 6,
+      L.circleMarker([lat, lon], {
+        radius: 7,
         color: "#05060a",
         weight: 2,
         fillColor: color,
         fillOpacity: 1,
+        interactive: false,
       }).addTo(layer);
       const name = v.ip?.city || v.ip?.addr || v.token;
-      dot.bindPopup(
-        `<div style="font:12px/1.55 Inter,sans-serif;color:#0b0e14">
+      const popupHtml = `<div style="font:13px/1.6 Inter,sans-serif;color:#0b0e14;padding:2px">
 <b>${esc(name)}</b><br/>
 ${esc(v.device?.os || "?")} · ${esc(v.device?.browser || "?")}<br/>
 ${v.points ?? "?"} data points<br/>
-<a href="/dashboard/sessions/${esc(v.token)}" style="color:#0e7490;font-weight:600">open dossier →</a>
-</div>`
-      );
+<a href="/dashboard/sessions/${esc(v.token)}" style="display:inline-block;margin-top:6px;padding:8px 14px;background:#0e7490;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">open dossier →</a>
+</div>`;
+      L.circleMarker([lat, lon], {
+        radius: 16,
+        stroke: false,
+        fillOpacity: 0,
+        fillColor: color,
+        className: "map-hit",
+      })
+        .addTo(layer)
+        .bindPopup(popupHtml, { minWidth: 200, maxWidth: 280 });
     }
     if (pts.length > fittedRef.current && pts.length > 0) {
       fittedRef.current = pts.length;

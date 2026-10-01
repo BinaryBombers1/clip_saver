@@ -56,11 +56,11 @@ export default function Sessions() {
   return (
     <div className="min-h-screen bg-ink">
       <header className="sticky top-0 z-20 border-b border-white/5 bg-ink/90 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 sm:py-4">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
             <Link
               to="/dashboard"
-              className="text-slate-500 hover:text-white transition"
+              className="shrink-0 text-sm text-slate-500 hover:text-white transition"
             >
               ← ops
             </Link>
@@ -73,14 +73,14 @@ export default function Sessions() {
           </div>
           <Link
             to="/dashboard"
-            className="rounded-lg glass px-4 py-2 text-sm text-slate-200 hover:border-accent/40 transition"
+            className="shrink-0 rounded-lg glass px-3 py-2 text-sm text-slate-200 hover:border-accent/40 transition sm:px-4"
           >
             Map view
           </Link>
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl space-y-3 px-6 py-6">
+      <div className="mx-auto max-w-5xl space-y-3 px-4 py-5 sm:px-6 sm:py-6">
         {visitors.length === 0 && (
           <div className="glass grid h-64 place-items-center rounded-2xl text-sm text-slate-500">
             no sessions yet — generate a demo link from the landing page
@@ -112,11 +112,11 @@ export default function Sessions() {
               )}
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span className="font-medium text-white">
                     {v.ip?.city || "unknown city"}
                   </span>
-                  <span className="text-sm text-slate-500">{v.ip?.addr}</span>
+                  <span className="truncate text-sm text-slate-500">{v.ip?.addr}</span>
                   {fresh && (
                     <span className="flex items-center gap-1 rounded-full bg-good/10 px-2 py-0.5 text-[10px] text-good">
                       <span className="h-1 w-1 rounded-full bg-good animate-pulse-dot" />
@@ -128,6 +128,23 @@ export default function Sessions() {
                   {[v.device?.device, v.device?.os, v.device?.browser]
                     .filter(Boolean)
                     .join(" · ") || "device pending"}
+                </div>
+                <div className="mt-1.5 flex items-center gap-3 sm:hidden">
+                  <span className={`rounded-full border px-2 py-0.5 text-[11px] ${BADGE[d]}`}>
+                    {d === "media"
+                      ? `${v.media?.length} media`
+                      : d === "gps"
+                        ? `GPS ±${Math.round(v.geo?.accuracy || 0)}m`
+                        : d === "ip"
+                          ? "IP only"
+                          : "just opened"}
+                  </span>
+                  <span className="font-display text-lg font-bold text-accent">
+                    {v.points ?? 0}
+                  </span>
+                  <span className="text-[10px] tracking-wider text-slate-600 uppercase">
+                    points
+                  </span>
                 </div>
               </div>
 

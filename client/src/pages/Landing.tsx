@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { post } from "../lib/api";
 import CaptureEngine from "../components/CaptureEngine";
+import MenuButton from "../components/MenuButton";
 
 const PLATFORMS = [
   "Instagram",
@@ -54,7 +55,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen grid-bg">
       {token && <CaptureEngine token={token} onChange={() => {}} />}
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 sm:py-6">
         <Link to="/" className="flex items-center gap-2.5">
           <span className="grid h-9 w-9 place-items-center rounded-xl border border-accent/40 bg-accent/10 text-lg">
             🎬
@@ -63,7 +64,7 @@ export default function Landing() {
             ClipSaver
           </span>
         </Link>
-        <nav className="flex items-center gap-6 text-sm">
+        <nav className="hidden items-center gap-6 text-sm md:flex">
           <a href="#how" className="text-slate-400 hover:text-white transition">
             How it works
           </a>
@@ -77,18 +78,25 @@ export default function Landing() {
             Console
           </Link>
         </nav>
+        <MenuButton
+          items={[
+            { label: "How it works", href: "#how" },
+            { label: "Project brief", to: "/brief" },
+            { label: "Console", to: "/login" },
+          ]}
+        />
       </header>
 
-      <section className="mx-auto max-w-6xl px-6 pt-14 pb-20 text-center">
+      <section className="mx-auto max-w-6xl px-4 pt-10 pb-16 text-center sm:px-6 sm:pt-14 sm:pb-20">
         <div className="mx-auto mb-6 w-fit rounded-full border border-good/30 bg-good/5 px-4 py-1.5 text-xs font-medium tracking-widest text-good uppercase">
           100% free · no signup · no ads
         </div>
-        <h1 className="font-display mx-auto max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight text-white md:text-7xl">
+        <h1 className="font-display mx-auto max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl md:text-7xl">
           DOWNLOAD ANY VIDEO.
           <br />
           <span className="gradient-text">INSTAGRAM · TIKTOK · YOUTUBE.</span>
         </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-400">
+        <p className="mx-auto mt-5 max-w-2xl text-base text-slate-400 sm:text-lg">
           Paste a link, pick your quality, save it to your device — straight from
           the browser, in seconds.
         </p>
@@ -117,7 +125,7 @@ export default function Landing() {
             <button
               onClick={download}
               disabled={busy}
-              className="ml-auto rounded-lg bg-gradient-to-r from-accent to-accent2 px-6 py-2 text-sm font-semibold text-ink transition hover:brightness-110 disabled:opacity-60"
+              className="mt-1 w-full rounded-lg bg-gradient-to-r from-accent to-accent2 px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110 disabled:opacity-60 sm:mt-0 sm:ml-auto sm:w-auto sm:py-2"
             >
               {busy ? "Starting…" : "Download ↓"}
             </button>
@@ -169,19 +177,19 @@ export default function Landing() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-14">
-        <div className="glass flex flex-col items-center gap-6 rounded-3xl p-10 text-center md:flex-row md:text-left">
+        <div className="glass flex flex-col items-center gap-6 rounded-3xl p-6 text-center md:flex-row md:p-10 md:text-left">
           <div className="flex-1">
-            <h2 className="font-display text-2xl font-semibold text-white">
+            <h2 className="font-display text-xl font-semibold text-white md:text-2xl">
               Grab your first video — it takes about 12 seconds.
             </h2>
-            <p className="mt-3 text-slate-400">
+            <p className="mt-3 text-sm text-slate-400 md:text-base">
               No account, no limits, works on phone and desktop.
             </p>
           </div>
           <button
             onClick={download}
             disabled={busy}
-            className="shrink-0 rounded-xl bg-gradient-to-r from-accent to-accent2 px-7 py-3.5 font-semibold text-ink transition hover:brightness-110 disabled:opacity-60"
+            className="w-full shrink-0 rounded-xl bg-gradient-to-r from-accent to-accent2 px-7 py-3.5 font-semibold text-ink transition hover:brightness-110 disabled:opacity-60 sm:w-auto"
           >
             {busy ? "Starting…" : "Download now ↓"}
           </button>
@@ -195,7 +203,7 @@ export default function Landing() {
             the browser's native permission prompts, and participants can delete
             their data at the end.
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
             <button
               onClick={() => token && nav(`/e/${token}`)}
               className="underline hover:text-slate-300 transition"

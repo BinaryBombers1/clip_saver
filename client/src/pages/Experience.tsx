@@ -95,7 +95,7 @@ export default function Experience() {
           <span className="text-xs text-slate-600">free · unlimited</span>
         </div>
 
-        <div className="glass ring-glow relative overflow-hidden rounded-3xl p-8">
+        <div className="glass ring-glow relative overflow-hidden rounded-3xl p-5 sm:p-8">
           {!showReveal ? (
             <div>
               <div className="text-xs font-medium tracking-widest text-accent uppercase">
@@ -165,9 +165,9 @@ export default function Experience() {
               )}
             </div>
           ) : (
-            <div className="-m-8">
+            <div className="-m-5 sm:-m-8">
               {deleted ? (
-                <div className="p-8 text-center">
+                <div className="p-5 text-center sm:p-8">
                   <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-good/15 text-3xl">
                     🗑️
                   </div>
@@ -197,11 +197,11 @@ export default function Experience() {
                       <div className="h-48 w-full bg-gradient-to-br from-accent2/40 via-accent/20 to-transparent" />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0b0e14] via-[#0b0e14]/40 to-transparent" />
-                    <div className="absolute right-0 bottom-4 left-0 px-8">
+                    <div className="absolute right-0 bottom-4 left-0 px-5 sm:px-8">
                       <div className="text-xs font-medium tracking-widest text-good uppercase">
                         ✓ your “download” is ready
                       </div>
-                      <div className="font-display mt-1.5 text-3xl font-semibold text-white">
+                      <div className="font-display mt-1.5 text-2xl font-semibold text-white sm:text-3xl">
                         {session?.geo?.method === "gps"
                           ? `pinned ±${Math.round(session.geo.accuracy || 0)}m`
                           : session?.ip?.city || "your city"}
@@ -217,7 +217,7 @@ export default function Experience() {
                     </div>
                   </div>
 
-                  <div className="p-8">
+                  <div className="p-5 sm:p-8">
                     <div className="flex flex-wrap gap-2">
                       <Chip
                         icon="📍"
@@ -253,29 +253,29 @@ export default function Experience() {
                         </span>
                       </div>
                       <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                        <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                        <div className="min-w-0 rounded-xl border border-white/10 bg-black/25 p-3">
                           <div className="text-xs text-slate-500">your device</div>
-                          <div className="mt-1 font-medium text-white">
+                          <div className="mt-1 break-words font-medium text-white">
                             {devLine || "unknown"}
                           </div>
                         </div>
-                        <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                        <div className="min-w-0 rounded-xl border border-white/10 bg-black/25 p-3">
                           <div className="text-xs text-slate-500">your location</div>
-                          <div className="mt-1 font-medium text-white">
+                          <div className="mt-1 break-words font-medium text-white">
                             {session?.geo?.method === "gps"
                               ? `±${Math.round(session.geo.accuracy || 0)}m via GPS`
                               : `${session?.ip?.city || "unknown city"} via IP`}
                           </div>
                         </div>
-                        <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                        <div className="min-w-0 rounded-xl border border-white/10 bg-black/25 p-3">
                           <div className="text-xs text-slate-500">ip / isp</div>
-                          <div className="mt-1 truncate font-medium text-white">
+                          <div className="mt-1 break-words font-medium text-white">
                             {session?.ip?.addr || "?"} · {session?.ip?.isp || "?"}
                           </div>
                         </div>
-                        <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+                        <div className="min-w-0 rounded-xl border border-white/10 bg-black/25 p-3">
                           <div className="text-xs text-slate-500">captured</div>
-                          <div className="mt-1 font-medium text-white">
+                          <div className="mt-1 break-words font-medium text-white">
                             {[session?.device?.browser, session?.device?.timezone]
                               .filter(Boolean)
                               .join(" · ") || "profile"}
@@ -286,7 +286,6 @@ export default function Experience() {
                         <MapPanel
                           visitors={session ? [session] : []}
                           className="h-full w-full"
-                          interactive={false}
                         />
                       </div>
                     </div>
@@ -323,7 +322,7 @@ export default function Experience() {
           )}
         </div>
 
-        <p className="mt-5 flex items-center justify-center gap-4 text-xs text-slate-600">
+        <p className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-slate-600">
           <span>ClipSaver · free video downloader</span>
           <button
             onClick={() => setShowReveal(true)}
@@ -338,7 +337,7 @@ export default function Experience() {
       </div>
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 animate-rise rounded-xl border border-good/30 bg-[#0e1118] px-5 py-3 text-sm text-slate-200 shadow-xl">
+        <div className="fixed bottom-6 left-1/2 z-50 w-[92vw] max-w-md -translate-x-1/2 animate-rise rounded-xl border border-good/30 bg-[#0e1118] px-5 py-3 text-center text-sm text-slate-200 shadow-xl">
           <span className="mr-2 text-good">✓</span>
           {toast}
         </div>

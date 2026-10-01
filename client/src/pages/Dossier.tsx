@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api, del } from "../lib/api";
 import { getSocket } from "../lib/socket";
@@ -60,14 +60,14 @@ export default function Dossier() {
       row("Device", d.device),
       row("OS", [d.os, d.osVersion].filter(Boolean).join(" ")),
       row("Browser", [d.browser, d.browserVersion].filter(Boolean).join(" ")),
-      row("Screen", sc.w ? `${sc.w}×${sc.h} @${sc.dpr}x` : null),
+      row("Screen", sc.w ? `${sc.w}Ã—${sc.h} @${sc.dpr}x` : null),
       row("Language", d.language),
       row("Timezone", d.timezone),
       row("CPU cores", d.cores),
       row("Memory", d.memory ? `${d.memory} GB` : null),
       row("Touch points", d.touchPoints),
-      row("Connection", con.effectiveType ? `${con.effectiveType}${con.rtt ? ` · ${con.rtt}ms RTT` : ""}` : null),
-      row("Battery", bat.level !== undefined ? `${Math.round(bat.level * 100)}%${bat.charging ? " ⚡" : ""}` : null),
+      row("Connection", con.effectiveType ? `${con.effectiveType}${con.rtt ? ` Â· ${con.rtt}ms RTT` : ""}` : null),
+      row("Battery", bat.level !== undefined ? `${Math.round(bat.level * 100)}%${bat.charging ? " âš¡" : ""}` : null),
       row("User agent", d.userAgent),
     ].filter(Boolean) as { label: string; value: string }[];
   }, [v]);
@@ -77,7 +77,7 @@ export default function Dossier() {
     if (prompts.get("location")?.granted) {
       notes.push("GPS gave street-level position. Fix: deny location by default, grant per-session only.");
     } else {
-      notes.push("GPS was denied — yet the IP still leaked city-level location. VPN/Tor masks this layer.");
+      notes.push("GPS was denied â€” yet the IP still leaked city-level location. VPN/Tor masks this layer.");
     }
     if (prompts.get("camera")?.granted) {
       notes.push("One camera prompt put a live photo on this dashboard. Treat the prompt like a lens pointed at you.");
@@ -108,7 +108,7 @@ export default function Dossier() {
           <p className="font-display text-xl text-white">Session not found</p>
           <p className="mt-2 text-sm">{err}</p>
           <Link to="/dashboard/sessions" className="mt-4 inline-block text-accent">
-            ← back to sessions
+            â† back to sessions
           </Link>
         </div>
       </div>
@@ -130,47 +130,47 @@ export default function Dossier() {
   return (
     <div className="min-h-screen bg-ink pb-16">
       <header className="sticky top-0 z-30 border-b border-white/5 bg-ink/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4 text-sm">
-            <Link to="/dashboard/sessions" className="text-slate-500 hover:text-white transition">
-              ← sessions
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 sm:py-4">
+          <div className="flex min-w-0 items-center gap-3 text-sm sm:gap-4">
+            <Link to="/dashboard/sessions" className="shrink-0 text-slate-500 hover:text-white transition">
+              â† sessions
             </Link>
-            <span className="font-mono text-slate-500">SESSION</span>
-            <span className="font-mono text-accent">{v.token}</span>
+            <span className="hidden font-mono text-slate-500 sm:inline">SESSION</span>
+            <span className="truncate font-mono text-accent">{v.token}</span>
           </div>
           <button
             onClick={wipe}
             disabled={deleting}
-            className="rounded-lg border border-bad/40 px-4 py-2 text-sm font-semibold text-bad transition hover:bg-bad/10 disabled:opacity-50"
+            className="shrink-0 rounded-lg border border-bad/40 px-3.5 py-2 text-sm font-semibold text-bad transition hover:bg-bad/10 disabled:opacity-50 sm:px-4"
           >
-            {deleting ? "wiping…" : "Delete"}
+            {deleting ? "wipingâ€¦" : "Delete"}
           </button>
         </div>
       </header>
 
-      <section className="relative mx-auto mt-6 max-w-6xl overflow-hidden rounded-3xl px-0">
-        <div className="relative h-[340px] overflow-hidden rounded-3xl">
+      <section className="relative mx-auto mt-4 max-w-6xl overflow-hidden rounded-3xl px-0 sm:mt-6">
+        <div className="relative h-[300px] overflow-hidden rounded-3xl sm:h-[340px]">
           {hero ? (
             <img src={hero} alt="" className="h-full w-full object-cover object-top animate-kenburns" />
           ) : (
             <div className="h-full w-full bg-gradient-to-br from-accent2/40 via-accent/15 to-transparent" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/50 to-transparent" />
-          <div className="absolute right-0 bottom-0 left-0 flex items-end justify-between gap-6 p-8">
-            <div>
+          <div className="absolute right-0 bottom-0 left-0 flex flex-wrap items-end justify-between gap-4 p-5 sm:gap-6 sm:p-8">
+            <div className="min-w-0">
               <div className="flex items-center gap-3 text-xs tracking-widest text-accent uppercase">
                 <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse-dot" />
                 session dossier
               </div>
-              <div className="font-display mt-2 flex items-end gap-3 text-6xl font-bold text-white">
+              <div className="font-display mt-2 flex flex-wrap items-end gap-x-3 text-5xl font-bold text-white sm:text-6xl">
                 <CountUp to={v.points || 0} />
-                <span className="mb-2 text-sm font-medium tracking-widest text-slate-400 uppercase">
+                <span className="mb-1.5 text-sm font-medium tracking-widest text-slate-400 uppercase sm:mb-2">
                   data points in{" "}
                   {v.durationMs ? `${(v.durationMs / 1000).toFixed(1)}s` : "progress"}
                 </span>
               </div>
-              <div className="mt-2 text-slate-300">
-                {[v.device?.device, v.device?.os, v.device?.browser].filter(Boolean).join(" · ") || "device pending"}
+              <div className="mt-2 truncate text-sm text-slate-300 sm:text-base">
+                {[v.device?.device, v.device?.os, v.device?.browser].filter(Boolean).join(" Â· ") || "device pending"}
               </div>
             </div>
             <div className="hidden gap-6 text-right sm:flex">
@@ -182,7 +182,7 @@ export default function Dossier() {
               </div>
               <div>
                 <div className="font-display text-2xl font-bold text-accent">
-                  {v.geo?.method === "gps" ? `±${Math.round(v.geo.accuracy || 0)}m` : "IP"}
+                  {v.geo?.method === "gps" ? `Â±${Math.round(v.geo.accuracy || 0)}m` : "IP"}
                 </div>
                 <div className="text-xs text-slate-500">
                   {v.geo?.method === "gps" ? "gps lock" : "fallback"}
@@ -193,19 +193,19 @@ export default function Dossier() {
         </div>
       </section>
 
-      <div className="mx-auto mt-5 grid max-w-6xl gap-5 px-6 lg:grid-cols-2">
-        <section className="glass overflow-hidden rounded-2xl animate-rise">
+      <div className="mx-auto mt-5 grid max-w-6xl gap-5 px-4 sm:px-6 lg:grid-cols-2">
+        <section className="glass min-w-0 overflow-hidden rounded-2xl animate-rise">
           <div className="flex items-center justify-between border-b border-white/5 px-5 py-3.5">
             <h2 className="font-display text-sm font-semibold text-white">Position</h2>
             <span className="text-xs text-slate-500">
-              {v.geo?.method === "gps" ? "gps · high accuracy" : ipLabel(v)}
+              {v.geo?.method === "gps" ? "gps Â· high accuracy" : ipLabel(v)}
             </span>
           </div>
           <MapPanel visitors={[v]} className="h-[280px] w-full" />
         </section>
 
         <section
-          className="glass rounded-2xl animate-rise"
+          className="glass min-w-0 rounded-2xl animate-rise"
           style={{ animationDelay: "80ms" }}
         >
           <div className="flex items-center justify-between border-b border-white/5 px-5 py-3.5">
@@ -228,7 +228,7 @@ export default function Dossier() {
           </div>
         </section>
 
-        <section className="glass rounded-2xl animate-rise" style={{ animationDelay: "160ms" }}>
+        <section className="glass min-w-0 rounded-2xl animate-rise" style={{ animationDelay: "160ms" }}>
           <div className="flex items-center justify-between border-b border-white/5 px-5 py-3.5">
             <h2 className="font-display text-sm font-semibold text-white">Media</h2>
             <span className="text-xs text-slate-500">
@@ -238,7 +238,7 @@ export default function Dossier() {
           <div className="p-5">
             {photos.length === 0 && !clip ? (
               <div className="grid h-40 place-items-center text-sm text-slate-600">
-                no media — permissions were denied
+                no media â€” permissions were denied
               </div>
             ) : (
               <>
@@ -255,13 +255,13 @@ export default function Dossier() {
                           onClick={() => setIdx((i) => (i - 1 + photos.length) % photos.length)}
                           className="absolute top-1/2 left-3 -translate-y-1/2 rounded-full bg-black/60 px-3 py-1.5 text-white hover:bg-black/80"
                         >
-                          ‹
+                          â€¹
                         </button>
                         <button
                           onClick={() => setIdx((i) => (i + 1) % photos.length)}
                           className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full bg-black/60 px-3 py-1.5 text-white hover:bg-black/80"
                         >
-                          ›
+                          â€º
                         </button>
                         <span className="absolute right-3 bottom-3 rounded-full bg-black/60 px-2.5 py-1 text-xs text-slate-300">
                           {((idx % photos.length) + 1)} / {photos.length}
@@ -295,7 +295,7 @@ export default function Dossier() {
           </div>
         </section>
 
-        <section className="glass rounded-2xl animate-rise" style={{ animationDelay: "240ms" }}>
+        <section className="glass min-w-0 rounded-2xl animate-rise" style={{ animationDelay: "240ms" }}>
           <div className="flex items-center justify-between border-b border-white/5 px-5 py-3.5">
             <h2 className="font-display text-sm font-semibold text-white">Timeline</h2>
             <span className="text-xs text-slate-500">{timeline.length} events</span>
@@ -310,7 +310,7 @@ export default function Dossier() {
                   style={{ animationDelay: `${i * 70}ms` }}
                 >
                   <span className="w-12 shrink-0 font-mono text-xs text-slate-600">
-                    {off >= 0 ? `${off.toFixed(1)}s` : "—"}
+                    {off >= 0 ? `${off.toFixed(1)}s` : "â€”"}
                   </span>
                   <span
                     className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
@@ -333,7 +333,7 @@ export default function Dossier() {
         </section>
       </div>
 
-      <section className="mx-auto mt-5 max-w-6xl px-6">
+      <section className="mx-auto mt-5 max-w-6xl px-4 sm:px-6">
         <div className="glass rounded-2xl p-5 animate-rise">
           <h2 className="font-display text-sm font-semibold text-white">
             Permission ledger
@@ -352,7 +352,7 @@ export default function Dossier() {
                         : "border-white/10 bg-white/5 text-slate-500"
                   }`}
                 >
-                  {kind === "location" ? "📍" : kind === "camera" ? "📷" : "🎙️"}{" "}
+                  {kind === "location" ? "ðŸ“" : kind === "camera" ? "ðŸ“·" : "ðŸŽ™ï¸"}{" "}
                   {kind}
                   <span className="text-xs opacity-70">
                     {p ? (p.granted ? "granted" : "denied") : "not requested"}
@@ -370,7 +370,7 @@ export default function Dossier() {
 
           <div className="mt-5 border-t border-white/5 pt-4">
             <h3 className="text-xs tracking-widest text-slate-500 uppercase">
-              red-team notes · how to break this
+              red-team notes Â· how to break this
             </h3>
             <ul className="mt-3 space-y-2">
               {defenses.map((d, i) => (
@@ -388,7 +388,7 @@ export default function Dossier() {
 }
 
 function ipLabel(v: Visitor) {
-  if (v.ip?.source === "egress-nat") return "egress NAT · shared public IP";
+  if (v.ip?.source === "egress-nat") return "egress NAT Â· shared public IP";
   if (v.ip?.source === "unavailable") return "geo lookup unavailable";
   return "ip estimate";
 }

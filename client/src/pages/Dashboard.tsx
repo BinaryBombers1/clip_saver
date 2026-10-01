@@ -5,6 +5,7 @@ import { getSocket, resetSocket } from "../lib/socket";
 import { adminEmail, clearToken } from "../lib/auth";
 import type { FeedLine, Visitor } from "../lib/types";
 import MapPanel from "../components/MapPanel";
+import MenuButton from "../components/MenuButton";
 
 const KIND_COLOR: Record<string, string> = {
   open: "bg-accent",
@@ -92,34 +93,50 @@ export default function Dashboard() {
               LIVE
             </span>
           </div>
-          <nav className="flex items-center gap-3 text-sm">
-            <Link
-              to="/dashboard/sessions"
-              className="rounded-lg glass px-4 py-2 text-slate-200 hover:border-accent/40 transition"
-            >
-              All sessions
-            </Link>
-            <span className="hidden text-xs text-slate-500 sm:inline">
-              {adminEmail()}
-            </span>
-            <button
-              onClick={() => {
-                clearToken();
-                resetSocket();
-                nav("/login");
-              }}
-              className="rounded-lg border border-white/10 px-4 py-2 text-slate-300 transition hover:border-bad/40 hover:text-bad"
-            >
-              Sign out
-            </button>
-            <Link to="/" className="text-slate-500 hover:text-white transition">
-              Landing
-            </Link>
-          </nav>
+          <div className="flex items-center gap-3">
+            <nav className="hidden items-center gap-3 text-sm md:flex">
+              <Link
+                to="/dashboard/sessions"
+                className="rounded-lg glass px-4 py-2 text-slate-200 hover:border-accent/40 transition"
+              >
+                All sessions
+              </Link>
+              <span className="text-xs text-slate-500">{adminEmail()}</span>
+              <button
+                onClick={() => {
+                  clearToken();
+                  resetSocket();
+                  nav("/login");
+                }}
+                className="rounded-lg border border-white/10 px-4 py-2 text-slate-300 transition hover:border-bad/40 hover:text-bad"
+              >
+                Sign out
+              </button>
+              <Link to="/" className="text-slate-500 hover:text-white transition">
+                Landing
+              </Link>
+            </nav>
+            <MenuButton
+              items={[
+                { label: "All sessions", to: "/dashboard/sessions" },
+                { label: "Landing", to: "/" },
+                { label: adminEmail() || "operator", muted: true },
+                {
+                  label: "Sign out",
+                  onClick: () => {
+                    clearToken();
+                    resetSocket();
+                    nav("/login");
+                  },
+                  danger: true,
+                },
+              ]}
+            />
+          </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 py-6">
+      <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {[
             { label: "sessions", value: visitors.length, color: "text-white" },
@@ -159,18 +176,18 @@ export default function Dashboard() {
         </div>
 
         <div className="mt-4 grid gap-4 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <div className="min-w-0 lg:col-span-2">
             {tab === "map" ? (
               <div className="glass overflow-hidden rounded-2xl">
                 <MapPanel
                   visitors={visitors}
-                  className="h-[420px] w-full"
+                  className="h-[320px] w-full sm:h-[420px]"
                 />
               </div>
             ) : (
               <div className="glass rounded-2xl p-4">
                 {photos.length === 0 ? (
-                  <div className="grid h-[420px] place-items-center text-sm text-slate-500">
+                  <div className="grid h-[320px] place-items-center px-4 text-center text-sm text-slate-500 sm:h-[420px]">
                     no media captured yet — open a demo link and allow the camera
                   </div>
                 ) : (
@@ -197,7 +214,7 @@ export default function Dashboard() {
             )}
 
             {latest && (
-              <div className="glass mt-4 flex items-center gap-5 rounded-2xl p-5 animate-rise">
+              <div className="glass mt-4 flex flex-wrap items-center gap-4 rounded-2xl p-4 animate-rise sm:gap-5 sm:p-5">
                 {latest.media?.find((m) => m.kind === "photo") ? (
                   <img
                     src={latest.media.find((m) => m.kind === "photo")!.url}
@@ -231,7 +248,7 @@ export default function Dashboard() {
                 </div>
                 <Link
                   to={`/dashboard/sessions/${latest.token}`}
-                  className="shrink-0 rounded-xl bg-accent/15 px-4 py-2.5 text-sm font-semibold text-accent transition hover:bg-accent/25"
+                  className="w-full shrink-0 rounded-xl bg-accent/15 px-4 py-2.5 text-center text-sm font-semibold text-accent transition hover:bg-accent/25 sm:w-auto"
                 >
                   dossier →
                 </Link>
@@ -239,7 +256,7 @@ export default function Dashboard() {
             )}
           </div>
 
-          <div className="glass flex h-[560px] flex-col rounded-2xl p-5">
+          <div className="glass flex h-[440px] min-w-0 flex-col rounded-2xl p-4 sm:h-[560px] sm:p-5">
             <div className="flex items-center justify-between">
               <span className="font-display text-sm font-semibold text-white tracking-wide">
                 ACTIVITY FEED

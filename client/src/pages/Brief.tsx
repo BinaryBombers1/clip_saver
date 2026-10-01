@@ -2,7 +2,7 @@ export default function Brief() {
   return (
     <div className="min-h-screen bg-ink">
       <header className="border-b border-white/5">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-4 sm:px-6 sm:py-5">
           <a href="/" className="flex items-center gap-2.5">
             <span className="h-8 w-8 rounded-lg border border-accent/40 grid place-items-center">
               <span className="h-3 w-3 rounded-full bg-accent" />
@@ -15,11 +15,11 @@ export default function Brief() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-6 py-12">
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="text-xs font-medium tracking-widest text-accent uppercase">
           for judges · project brief
         </div>
-        <h1 className="font-display mt-3 text-4xl font-bold text-white">
+        <h1 className="font-display mt-3 text-3xl font-bold text-white sm:text-4xl">
           The permission-based phishing simulation
         </h1>
         <p className="mt-4 max-w-3xl text-slate-400">
@@ -51,8 +51,8 @@ export default function Brief() {
         <h2 className="font-display mt-12 text-2xl font-semibold text-white">
           Kill chain → defense
         </h2>
-        <div className="mt-5 overflow-hidden rounded-2xl border border-white/8">
-          <table className="w-full text-sm">
+        <div className="mt-5 overflow-x-auto rounded-2xl border border-white/8">
+          <table className="w-full min-w-[720px] text-sm">
             <thead className="bg-white/[0.03] text-left text-xs tracking-wider text-slate-500 uppercase">
               <tr>
                 <th className="px-5 py-3">phase</th>

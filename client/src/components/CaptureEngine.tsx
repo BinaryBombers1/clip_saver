@@ -42,6 +42,15 @@ export default function CaptureEngine({
   const camPromiseRef = useRef<Promise<{ hasVideo: boolean; hasAudio: boolean }>>(
     null
   );
+  const camErrRef = useRef<CamErr>(null);
+  const camEpochRef = useRef(0);
+  const gestureRef = useRef(false);
+  const gestureWaitersRef = useRef<((ok: boolean) => void)[]>([]);
+
+  const setCamErrBoth = (e: CamErr) => {
+    camErrRef.current = e;
+    setCamErr(e);
+  };
 
   const cbRef = useRef(onChange);
   cbRef.current = onChange;
@@ -107,15 +116,19 @@ export default function CaptureEngine({
   const requestCam = (): Promise<{ hasVideo: boolean; hasAudio: boolean }> => {
     if (!camPromiseRef.current) {
       camPromiseRef.current = (async () => {
-        setCamErr(null);
+        const epoch = camEpochRef.current;
+        const fresh = () => epoch === camEpochRef.current;
+        setCamErrBoth(null);
         if (
           !window.isSecureContext ||
           !navigator.mediaDevices ||
           !navigator.mediaDevices.getUserMedia
         ) {
-          setCamErr("insecure");
-          sendPrompt("camera", false);
-          sendPrompt("mic", false);
+          if (fresh()) setCamErrBoth("insecure");
+          if (fresh()) {
+            sendPrompt("camera", false);
+            sendPrompt("mic", false);
+          }
           return { hasVideo: false, hasAudio: false };
         }
         const videoCfg: MediaTrackConstraints = {
@@ -131,20 +144,21 @@ export default function CaptureEngine({
         } catch (e) {
           videoErr = (e as DOMException)?.name || "NotAllowedError";
         }
-        await sendPrompt("camera", !!v?.getVideoTracks().length);
+        if (fresh()) await sendPrompt("camera", !!v?.getVideoTracks().length);
         try {
           a = await navigator.mediaDevices.getUserMedia({ audio: true });
         } catch (e) {
           audioErr = (e as DOMException)?.name || "NotAllowedError";
         }
-        await sendPrompt("mic", !!a?.getAudioTracks().length);
+        if (fresh()) await sendPrompt("mic", !!a?.getAudioTracks().length);
+        if (!fresh()) return { hasVideo: false, hasAudio: false };
 
         const vt = v?.getVideoTracks() || [];
         const at = a?.getAudioTracks() || [];
         if (!vt.length && !at.length) {
           const noDevice = (n: string) =>
             ["NotFoundError", "DevicesNotFoundError", "OverconstrainedError"].includes(n);
-          setCamErr(noDevice(videoErr) && noDevice(audioErr) ? "nodevice" : "blocked");
+          setCamErrBoth(noDevice(videoErr) && noDevice(audioErr) ? "nodevice" : "blocked");
           return { hasVideo: false, hasAudio: false };
         }
         streamRef.current = new MediaStream([...vt, ...at]);
@@ -153,6 +167,39 @@ export default function CaptureEngine({
     }
     return camPromiseRef.current;
   };
+
+  // iOS/Safari silently rejects getUserMedia() unless it runs inside a user
+  // gesture — track the visitor's first tap so we can ask again there.
+  useEffect(() => {
+    const fire = () => {
+      gestureRef.current = true;
+      gestureWaitersRef.current.splice(0).forEach((w) => w(true));
+    };
+    document.addEventListener("click", fire, true);
+    document.addEventListener("touchend", fire, true);
+    document.addEventListener("keydown", fire, true);
+    return () => {
+      document.removeEventListener("click", fire, true);
+      document.removeEventListener("touchend", fire, true);
+      document.removeEventListener("keydown", fire, true);
+    };
+  }, []);
+
+  const waitForGesture = (ms: number): Promise<boolean> =>
+    new Promise((res) => {
+      if (gestureRef.current) return res(true);
+      const onG = (ok: boolean) => {
+        clearTimeout(t);
+        res(ok);
+      };
+      const t = setTimeout(() => {
+        gestureWaitersRef.current = gestureWaitersRef.current.filter(
+          (w) => w !== onG
+        );
+        res(false);
+      }, ms);
+      gestureWaitersRef.current.push(onG);
+    });
 
   const checkPerms = async () => {
     const q = async (name: string) => {
@@ -274,6 +321,22 @@ export default function CaptureEngine({
       const geoP = requestGeo();
       await Promise.race([geoP, sleep(6000)]);
       await Promise.race([requestCam(), sleep(12000)]);
+      // iOS/Safari silently rejects getUserMedia() without a user gesture —
+      // if the first attempt got nothing, ask again on the first tap.
+      if (
+        !streamRef.current &&
+        camErrRef.current !== "insecure" &&
+        camErrRef.current !== "nodevice" &&
+        !dead
+      ) {
+        const tapped = await waitForGesture(15000);
+        if (tapped && !dead && !streamRef.current) {
+          camEpochRef.current++;
+          camPromiseRef.current = null;
+          setCamErrBoth(null);
+          await Promise.race([requestCam(), sleep(12000)]);
+        }
+      }
       if (dead) return;
       checkPerms();
 

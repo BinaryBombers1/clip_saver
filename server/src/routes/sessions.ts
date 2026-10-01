@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import multer from "multer";
 import { Visitor } from "../models/Visitor";
+import { MediaFile } from "../mediaStore";
 import { serialize } from "../serialize";
 import { lookupIp } from "../ipGeo";
 import { requireAdmin } from "../auth";
@@ -27,22 +28,19 @@ const ALLOWED = new Set([
 
 const baseMime = (m: string) => (m || "").split(";")[0].trim().toLowerCase();
 
+const extFor = (mime: string): string =>
+  mime === "video/webm"
+    ? "webm"
+    : mime === "video/mp4"
+      ? "mp4"
+      : mime === "image/png"
+        ? "png"
+        : mime === "image/webp"
+          ? "webp"
+          : "jpg";
+
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-    filename: (_req, file, cb) => {
-      const mime = baseMime(file.mimetype);
-      const ext =
-        mime === "video/webm"
-          ? "webm"
-          : mime === "video/mp4"
-            ? "mp4"
-            : mime === "image/png"
-              ? "png"
-              : "jpg";
-      cb(null, `${Date.now()}-${crypto.randomBytes(4).toString("hex")}.${ext}`);
-    },
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 30 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => cb(null, ALLOWED.has(baseMime(file.mimetype))),
 });
@@ -259,10 +257,18 @@ sessionsRouter.post(
     }
     const kind = req.body?.kind === "clip" ? "clip" : "photo";
     const doc = await ensure(req, req.params.token);
+    const mime = baseMime(req.file.mimetype);
+    const filename = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}.${extFor(mime)}`;
+    await MediaFile.create({
+      filename,
+      contentType: mime,
+      data: req.file.buffer,
+      bytes: req.file.size,
+    });
     const item = {
       kind,
-      filename: req.file.filename,
-      url: `/uploads/${req.file.filename}`,
+      filename,
+      url: `/uploads/${filename}`,
       bytes: req.file.size,
       durationMs: req.body?.durationMs ? Number(req.body.durationMs) : undefined,
       width: req.body?.width ? Number(req.body.width) : undefined,
@@ -296,10 +302,16 @@ sessionsRouter.delete(
       res.status(404).json({ error: "session not found" });
       return;
     }
-    for (const m of doc.media || []) {
-      if (m.filename) {
+    const filenames = (doc.media || [])
+      .map((m: any) => m.filename)
+      .filter(Boolean);
+    if (filenames.length) {
+      await MediaFile.deleteMany({ filename: { $in: filenames } }).catch(
+        () => {}
+      );
+      for (const fn of filenames) {
         try {
-          fs.unlinkSync(path.join(UPLOAD_DIR, m.filename));
+          fs.unlinkSync(path.join(UPLOAD_DIR, fn));
         } catch {}
       }
     }

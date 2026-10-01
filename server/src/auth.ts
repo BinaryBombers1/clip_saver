@@ -52,18 +52,23 @@ export function requireAdmin(
 }
 
 const hits = new Map<string, number[]>();
-function limited(ip: string): boolean {
+function recent(ip: string): number[] {
   const now = Date.now();
   const arr = (hits.get(ip) || []).filter((t) => now - t < 5 * 60_000);
-  arr.push(now);
   hits.set(ip, arr);
-  return arr.length > 5;
+  return arr;
+}
+function isLimited(ip: string): boolean {
+  return recent(ip).length > 5;
+}
+function recordFailure(ip: string) {
+  recent(ip).push(Date.now());
 }
 
 export const authRouter = Router();
 
 authRouter.post("/login", (req, res) => {
-  if (limited(req.ip || "")) {
+  if (isLimited(req.ip || "")) {
     res.status(429).json({ error: "too many attempts — try again in 5 minutes" });
     return;
   }
@@ -71,6 +76,7 @@ authRouter.post("/login", (req, res) => {
   const ok =
     safeEq(String(email || ""), EMAIL) && safeEq(String(password || ""), PASSWORD);
   if (!ok) {
+    recordFailure(req.ip || "");
     res.status(401).json({ error: "invalid email or password" });
     return;
   }

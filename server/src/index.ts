@@ -10,6 +10,7 @@ import { connectDb } from "./db";
 import { sessionsRouter } from "./routes/sessions";
 import { authRouter, verifyToken } from "./auth";
 import { Visitor } from "./models/Visitor";
+import { MediaFile } from "./mediaStore";
 import { lookupIp } from "./ipGeo";
 import { serialize } from "./serialize";
 
@@ -78,7 +79,30 @@ async function main() {
   fs.mkdirSync(UPLOADS, { recursive: true });
 
   app.get("/api/health", (_req, res) => res.json({ ok: true }));
-  app.use("/uploads", express.static(UPLOADS));
+  app.get("/uploads/:fn", async (req, res) => {
+    const fn = path.basename(req.params.fn || "");
+    if (!/^[a-zA-Z0-9._-]+$/.test(fn)) {
+      res.status(404).json({ error: "not found" });
+      return;
+    }
+    try {
+      const doc = await MediaFile.findOne({ filename: fn });
+      if (doc?.data?.length) {
+        res.setHeader("Content-Type", doc.contentType || "application/octet-stream");
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        res.send(doc.data);
+        return;
+      }
+    } catch (e) {
+      console.error("[uploads]", e);
+    }
+    const legacy = path.join(UPLOADS, fn);
+    if (fs.existsSync(legacy)) {
+      res.sendFile(legacy);
+      return;
+    }
+    res.status(404).json({ error: "not found" });
+  });
   app.use("/api/auth", authRouter);
   app.use("/api/sessions", sessionsRouter);
 

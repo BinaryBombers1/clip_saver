@@ -1,6 +1,7 @@
 {
   "name": "echo",
   "private": true,
+  "engines": { "node": ">=18" },
   "workspaces": ["client", "server"],
   "scripts": {
     "dev": "concurrently -n api,web -c magenta,cyan \"npm run dev -w server\" \"npm run dev -w client\"",

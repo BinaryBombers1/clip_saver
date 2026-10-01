@@ -1,0 +1,2 @@
+[phases.setup]
+nodePkgs = ["nodejs-20.x"]

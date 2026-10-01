@@ -1,0 +1,17 @@
+{
+  "name": "echo",
+  "private": true,
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "dev": "concurrently -n api,web -c magenta,cyan \"npm run dev -w server\" \"npm run dev -w client\"",
+    "dev:web": "npm run dev -w client",
+    "dev:api": "npm run dev -w server",
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
+    "tunnel": "ngrok http 4000"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

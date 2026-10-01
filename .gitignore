@@ -1,0 +1,10 @@
+node_modules/
+.next/
+dist/
+server/uploads/
+.env
+.env.local
+.env*.local
+*.log
+.DS_Store
+atlas-credentials.env

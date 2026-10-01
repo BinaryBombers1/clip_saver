@@ -23,5 +23,9 @@
     "tailwindcss": "^4.1.0",
     "typescript": "^5.7.2",
     "vite": "^6.3.5"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.63.5",
+    "@tailwindcss/oxide-linux-x64-gnu": "4.3.3"
   }
 }

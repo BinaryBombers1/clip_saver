@@ -7,5 +7,5 @@ server/uploads/
 .env*.local
 *.log
 .DS_Store
-atlas-credentials.env
+atlas-credentials*.env
 temp.txt
